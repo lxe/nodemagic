@@ -29,12 +29,10 @@ die () {
 [ -z "$1" ] && die "usage: autonode node|npm ..."
 
 # Verify that you have at least some kind of node
-which node 2>&1>/dev/null || die "\"node\" command not found. Node.js/io.js \
-  is probably not installed on this system"
+which node 2>&1>/dev/null || die "\"node\" command not found. Node.js/io.js is probably not installed on this system."
 
 # Verify that package.json exists
-[ -f ./package.json ] || die "\"package.json\" is not in $PWD. Autonode must \
-  be run from the root of a node project directory"
+[ -f ./package.json ] || die "\"package.json\" is not in $PWD. Autonode must be run from the root of a node project directory."
 
 # Set up cache directory
 [ -d $cache_dir ] || mkdir -p $cache_dir/node_modules
