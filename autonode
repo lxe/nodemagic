@@ -51,19 +51,6 @@ read_target_version () {
   return 0
 }
 
-read_arch () {
-  local arch
-  local isa
-  uname=$(uname -a)
-  local arch=darwin
-  echo $uname | grep Linux && arch=linux
-
-  local isa=x86
-  echo $uname | grep x86_64 && isa=x64
-
-  echo $arch-$isa
-}
-
 # Read target node and NPM versions
 target_node_version="$(read_target_version node || echo $host_node_version)"
 target_npm_version="$(read_target_version npm || echo $host_npm_version)"
@@ -87,7 +74,7 @@ if $(${bin_dir}/semver $host_npm_version -r $target_npm_version > /dev/null); th
 else
   target_npm_dir=${cache_dir}/npm/${target_npm_version}
   target_npm="${target_npm_dir}/node_modules/.bin/npm"
-  if [ ! -d ${target_npm_dir} ]; then
+  if [ ! -f ${target_npm} ]; then
     mkdir -p ${target_npm_dir}/node_modules
     log "Installing npm@${target_npm_version}..."
     $host_npm_install --prefix=${target_npm_dir} npm@${target_npm_version}
@@ -99,16 +86,16 @@ if $(${bin_dir}/semver $host_node_version -r $target_node_version > /dev/null); 
 else
   target_node_dir=${cache_dir}/node/${target_node_version}
   target_node="${target_node_dir}/bin/node"
-  if [ ! -d ${target_node_dir} ]; then
+  if [ ! -f ${target_node} ]; then
     mkdir -p ${target_node_dir}
     log "Installing node@${target_node_version}..."
 
-    arch=$(read_arch)
-    node_url=http://nodejs.org/dist/v${target_node_version}/node-v${target_node_version}-${arch}.tar.gz
+    local_arch=$(node -e "console.log(require('os').platform() + '-' + require('os').arch())")
+    node_url=http://nodejs.org/dist/v${target_node_version}/node-v${target_node_version}-${local_arch}.tar.gz
 
-    pushd ${target_node_dir}
-      curl -q ${node_url} | tar xz --strip-components=1 || rmdir -p ${target_node_dir}
-    popd
+    pushd ${target_node_dir} > /dev/null
+      curl -s ${node_url} | tar xz --strip-components=1 || rmdir -p ${target_node_dir} >/dev/null
+    popd > /dev/null
   fi
 fi
 
