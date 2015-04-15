@@ -1,6 +1,13 @@
 {
   "engines": {
-    "node": "0.8.26",
-    "npm": "1.x"
+    "node": "0.11.0",
+    "npm": "2.7.1"
+  },
+  "dependencies": {
+    "rimraf": "*"
+  },
+  "scripts": {
+    "setup": "mkdir -p lol/foo",
+    "teardown": "rimraf lol"
   }
 }

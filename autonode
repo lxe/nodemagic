@@ -31,8 +31,8 @@ die () {
 # Verify that you have at least some kind of node
 which node 2>&1>/dev/null || die "\"node\" command not found. Node.js/io.js is probably not installed on this system."
 
-# Verify that package.json exists
-[ -f ./package.json ] || die "\"package.json\" is not in $PWD. Autonode must be run from the root of a node project directory."
+# Verify that package.json exists. Otherwise just run the command
+[ -f ./package.json ] || exec "$@"
 
 # Set up cache directory
 [ -d $cache_dir ] || mkdir -p $cache_dir/node_modules
@@ -53,16 +53,14 @@ read_target_version () {
 target_node_version="$(read_target_version node || echo $host_node_version)"
 target_npm_version="$(read_target_version npm || echo $host_npm_version)"
 
-# log "Host node version   ${txt_ylw}$host_node_version${txt_rst}"
-# log "Target node version ${txt_grn}$target_node_version${txt_rst}"
-# log "Host npm version    ${txt_ylw}$host_npm_version${txt_rst}"
-# log "Target npm version  ${txt_grn}$target_npm_version${txt_rst}"
+log "Host node version   ${txt_ylw}$host_node_version${txt_rst}"
+log "Target node version ${txt_grn}$target_node_version${txt_rst}"
+log "Host npm version    ${txt_ylw}$host_npm_version${txt_rst}"
+log "Target npm version  ${txt_grn}$target_npm_version${txt_rst}"
 
 host_npm_install="npm install \
   --registry=https://registry.npmjs.org \
-  --always-auth=false \
-  --loglevel=silent \
-  --spin=false"
+  --always-auth=false"
 
 # Bootstrap semver
 [ -f "${bin_dir}/semver" ] || $host_npm_install --prefix=${cache_dir} semver > /dev/null
@@ -98,7 +96,7 @@ else
 fi
 
 if [ "$1" == "npm" ]; then
-  $target_npm "${*:2}"
+  $target_npm ${*:2}
 else
-  $target_node "${*:2}"
+  $target_node ${*:2}
 fi
