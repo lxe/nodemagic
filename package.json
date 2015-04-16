@@ -1,6 +1,6 @@
 {
   "name": "autonode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "'node' and 'npm' replacement that uses versions from package.json/engines.",
   "main": "autonode",
   "directories": {
