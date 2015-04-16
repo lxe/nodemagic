@@ -5,7 +5,7 @@ txt_grn='\033[0;32m' # Green
 txt_ylw='\033[0;33m' # Yellow
 txt_rst='\033[0m'    # Text Reset
 
-cache_dir="$HOME/.autonode"
+cache_dir="$HOME/.nodemagic"
 bin_dir="${cache_dir}/node_modules/.bin"
 
 log () {
@@ -26,7 +26,7 @@ die () {
 }
 
 # Let's make sure we're running something
-[ -z "$1" ] && die "usage: autonode node|npm ..."
+[ -z "$1" ] && die "usage: nodemagic node|npm ..."
 
 # Verify that you have at least some kind of node
 which node 2>&1>/dev/null || die "\"node\" command not found. Node.js/io.js is probably not installed on this system."

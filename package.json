@@ -1,20 +1,20 @@
 {
-  "name": "autonode",
+  "name": "nodemagic",
   "version": "1.0.1",
   "description": "'node' and 'npm' replacement that uses versions from package.json/engines.",
-  "main": "autonode",
+  "main": "nodemagic",
   "directories": {
     "test": "test"
   },
   "bin": {
-    "autonode": "autonode"
+    "nodemagic": "nodemagic"
   },
   "scripts": {
     "test": "echo tests pass"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lxe/autonode.git"
+    "url": "https://github.com/lxe/nodemagic.git"
   },
   "keywords": [
     "node",
@@ -28,7 +28,7 @@
   "author": "Aleksey Smolenchuk <lxe@lxe.co>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lxe/autonode/issues"
+    "url": "https://github.com/lxe/nodemagic/issues"
   },
-  "homepage": "https://github.com/lxe/autonode"
+  "homepage": "https://github.com/lxe/nodemagic"
 }
