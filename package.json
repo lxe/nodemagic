@@ -1,0 +1,34 @@
+{
+  "name": "autonode",
+  "version": "1.0.0",
+  "description": "'node' and 'npm' replacement that uses versions from package.json/engines.",
+  "main": "autonode",
+  "directories": {
+    "test": "test"
+  },
+  "bin": {
+    "autonode": "autonode"
+  },
+  "scripts": {
+    "test": "echo tests pass"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lxe/autonode.git"
+  },
+  "keywords": [
+    "node",
+    "nvm",
+    "n",
+    "version",
+    "manager",
+    "engines",
+    "versions"
+  ],
+  "author": "Aleksey Smolenchuk <lxe@lxe.co>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lxe/autonode/issues"
+  },
+  "homepage": "https://github.com/lxe/autonode"
+}

@@ -10,7 +10,7 @@ Run versions of `node` and `npm` specified in your `./package.json`.
 
 ### Usage
 
- 1. Install it by [donwloading](https://raw.githubusercontent.com/lxe/autonode/master/autonode) and placing `autonode` in your path. Sorry, no copy-paste bash one-liner.
+ 1. `npm install autonode -g` *or* [download](https://raw.githubusercontent.com/lxe/autonode/master/autonode) and place `autonode` in your path. Sorry, no copy-paste bash one-liner.
  2. `cd` into a project that has `package.json` with `engines` set up.
  3. Use:
    - `autonode npm install` isntead of `npm install`
