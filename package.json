@@ -1,6 +1,6 @@
 {
   "name": "nodemagic",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "'node' and 'npm' replacement that uses versions from package.json/engines.",
   "main": "nodemagic",
   "directories": {
