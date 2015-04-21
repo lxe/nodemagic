@@ -8,22 +8,28 @@ txt_rst='\033[0m'    # Text Reset
 cache_dir="$HOME/.nodemagic"
 bin_dir="${cache_dir}/node_modules/.bin"
 
+node_root="http://nodejs.org/dist"
+
 log () {
-  [ -z "$1" ] || echo -e "[AUTONODE LOG] $1"
+  [ -z "$1" ] || echo -e "[NODEMAGIC LOG] $1"
 }
 
 err () {
-  [ -z "$1" ] || echo -e "${txt_red}[AUTONODE ERROR]${txt_rst} $1"
+  [ -z "$1" ] || echo -e "${txt_red}[NODEMAGIC ERROR]${txt_rst} $1"
 }
 
 warn () {
-  [ -z "$1" ] || echo -e "${txt_ylw}[AUTONODE WARNING]${txt_rst} $1"
+  [ -z "$1" ] || echo -e "${txt_ylw}[NODEMAGIC WARNING]${txt_rst} $1"
 }
 
 die () {
   err "$1"
   exit -1
 }
+
+host_npm_install="npm install \
+  --registry=https://registry.npmjs.org \
+  --always-auth=false"
 
 # Let's make sure we're running something
 [ -z "$1" ] && die "usage: nodemagic node|npm ..."
@@ -35,11 +41,26 @@ which node 2>&1>/dev/null || die "\"node\" command not found. Node.js/io.js is p
 [ -f ./package.json ] || exec "$@"
 
 # Set up cache directory
-[ -d $cache_dir ] || mkdir -p $cache_dir/node_modules
+[ -d $cache_dir ] || mkdir -p $cache_dir/node_modules/.bin
+
+# Bootstrap semver
+[ -f "${bin_dir}/semver" ] || $host_npm_install --prefix=${cache_dir} semver > /dev/null
 
 # Read host node and NPM versions
 host_node_version=$(node -v | tr -d v)
 host_npm_version=$(npm -v)
+
+all_node_versions () {
+  local versions
+  if [ -f ${cache_dir}/versions ]; then
+    versions=$(cat ${cache_dir}/versions)
+    exec curl -s http://nodejs.org/dist/ | grep -Po 'v\d+\.\d+\.\d+' | uniq | sort > ${cache_dir}/versions
+  else
+    versions=$(curl -s http://nodejs.org/dist/ | grep -Po 'v\d+\.\d+\.\d+' | uniq | sort)
+    echo $versions > ${cache_dir}/versions
+  fi
+  echo $versions
+}
 
 read_target_version () {
   local version
@@ -53,17 +74,33 @@ read_target_version () {
 target_node_version="$(read_target_version node || echo $host_node_version)"
 target_npm_version="$(read_target_version npm || echo $host_npm_version)"
 
+resolve_node_version () {
+  local versions=$(all_node_versions)
+  target_node_version=$(${bin_dir}/semver -r $target_node_version $versions)
+  target_node_version=$(echo $target_node_version | awk '{print $NF}')
+}
+
+# Determine proper version based on range
+if (echo $target_node_version | grep -q -P '[x^~<>=]'); then
+  semver_version=$target_node_version
+  resolve_node_version
+
+  # No valid version found. Blow away the cache and resolve again
+  if [ -z "$target_node_version" ]; then
+     rm -rf ${cache_dir}/versions
+     resolve_node_version
+  fi
+
+  # Still no valid version found. Bail out
+  if [ -z "$target_node_version" ]; then
+     die "No valid node version matches the range $semver_version specified in package.json/versions/node"
+  fi
+fi
+
 log "Host node version   ${txt_ylw}$host_node_version${txt_rst}"
 log "Target node version ${txt_grn}$target_node_version${txt_rst}"
 log "Host npm version    ${txt_ylw}$host_npm_version${txt_rst}"
 log "Target npm version  ${txt_grn}$target_npm_version${txt_rst}"
-
-host_npm_install="npm install \
-  --registry=https://registry.npmjs.org \
-  --always-auth=false"
-
-# Bootstrap semver
-[ -f "${bin_dir}/semver" ] || $host_npm_install --prefix=${cache_dir} semver > /dev/null
 
 if $(${bin_dir}/semver $host_npm_version -r $target_npm_version > /dev/null); then
   target_npm="npm"
@@ -87,10 +124,14 @@ else
     log "Installing node@${target_node_version}..."
 
     local_arch=$(node -e "console.log(require('os').platform() + '-' + require('os').arch())")
-    node_url=http://nodejs.org/dist/v${target_node_version}/node-v${target_node_version}-${local_arch}.tar.gz
+    node_url=${node_root}/v${target_node_version}/node-v${target_node_version}-${local_arch}.tar.gz
 
     pushd ${target_node_dir} > /dev/null
-      curl -s ${node_url} | tar xz --strip-components=1 || rmdir -p ${target_node_dir} >/dev/null
+      curl -s ${node_url} | tar xz --strip-components=1
+      if [ "$?" -ne "0" ]; then
+        rm -rf ${target_node_dir} >/dev/null
+        die "Unable to download and extract $node_url"
+      fi
     popd > /dev/null
   fi
 fi
