@@ -1,7 +1,7 @@
 {
   "engines": {
     "node": "0.12.x",
-    "npm": "2.x"
+    "npm": "1.x"
   },
   "dependencies": {
     "rimraf": "*"

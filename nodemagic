@@ -29,10 +29,12 @@ die () {
 
 host_npm_install="npm install \
   --registry=https://registry.npmjs.org \
-  --always-auth=false"
+  --always-auth=false \
+  --loglevel=http"
 
 # Let's make sure we're running something
-[ -z "$1" ] && die "usage: nodemagic node|npm ..."
+[ "$1" == "npm" ] || [ "$1" == "node" ] || [ "$1" == "iojs" ] || \
+  die "usage: nodemagic node|iojs|npm ..."
 
 # Verify that you have at least some kind of node
 which node 2>&1>/dev/null || die "\"node\" command not found. Node.js/io.js is probably not installed on this system."
@@ -102,6 +104,7 @@ log "Target node version ${txt_grn}$target_node_version${txt_rst}"
 log "Host npm version    ${txt_ylw}$host_npm_version${txt_rst}"
 log "Target npm version  ${txt_grn}$target_npm_version${txt_rst}"
 
+# Install/set npm
 if $(${bin_dir}/semver $host_npm_version -r $target_npm_version > /dev/null); then
   target_npm="npm"
 else
@@ -114,6 +117,7 @@ else
   fi
 fi
 
+# Install/set node
 if $(${bin_dir}/semver $host_node_version -r $target_node_version > /dev/null); then
   target_node="node"
 else
