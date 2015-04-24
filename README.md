@@ -2,11 +2,13 @@
 
 Run versions of `node` and `npm` specified in your `./package.json`.
 
+![](http://i.imgur.com/gXH2OCD.gif)
+
 ### Features
 
  - Automatically reads [`package.json/engines`](https://docs.npmjs.com/files/package.json#engines) and uses those versions.
  - Automatically installs and caches npm and node versions for your specific platform
- - Probably works.
+ - Nothing to configure
 
 ### Usage
 
